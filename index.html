@@ -193,7 +193,7 @@
         <div class="columns is-centered">
           <div class="column has-text-centered">
             <!-- TODO: Replace with your paper title -->
-            <h1 class="title is-1 publication-title">ReGIL: Retrieval-Guided Imitation Learning from a Single Visual Demonstration</h1>
+            <h1 class="title is-1 publication-title">ReGIL: Retrieval-Guided Imitation Learning from a Single Demonstration</h1>
             <div class="is-size-5 publication-authors">
               <!-- TODO: Replace with your paper authors and their personal links -->
               <span class="author-block">
@@ -277,16 +277,17 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-           Learning visuomotor manipulation policies from a single demonstration is challenging due to severe distribution shift and the costly online interaction.
-            In this work, we propose ReGIL, a retrieval-guided imitation learning framework that enables robots to learn effective manipulation skills from only one demonstration.
-            Our key insight is to treat the demonstration as a reusable non-parametric memory that can guide online learning rather than just the static supervision.
-            ReGIL combines demonstration retrieval with policy optimization to provide three complementary signals: exploration guidance, reward shaping, and policy regularization.
-            Specifically, the demonstration serves as a queryable external memory for exploration and reward shaping.
-            Successful trajectories collected during the retrieval-replay phase provide the regularization distribution for policy optimization, enabling stable online improvement from limited data.
-            We evaluate ReGIL on challenging robotic manipulation tasks from the LIBERO and Meta-World benchmarks under the single demonstration setting.
-            Experimental results show that ReGIL outperforms prior imitation and reinforcement learning baselines in terms of success rate and training efficiency.
-            In real-robot experiments, using only one demonstration and less than one hour of online training, ReGIL achieves over 80% success rate across three manipulation tasks.
-            These results demonstrate that ReGIL is a practical and effective method for data-efficient robot skill acquisition.
+           Learning robot manipulation policies with deep neural networks from a single demonstration remains highly challenging,
+              as even small deviations from the demonstrated trajectory can quickly compound into failure, while collecting substantial online interaction data is costly.
+        We propose ReGIL, a retrieval-guided imitation learning framework that treats a single demonstration as reusable memory for online robot learning from image observations.
+              ReGIL repeatedly accesses this memory to retrieves task-relevant expert segments throughout training.
+              These segments guide early exploration, regularize policy updates with successful replayed experience,
+              and provide dense rewards through local temporal alignment conditioned on the agent's current progress.
+              This segment-level reward yields step-wise, informative, and computationally efficient feedback for policy improvement.
+              We evaluate ReGIL on challenging robotic manipulation tasks from the LIBERO and Meta-World benchmarks under the single demonstration setting.
+              ReGIL outperforms prior baselines in both success rate and training efficiency.
+              In real-robot experiments, using only one demonstration and less than one hour of online training, ReGIL achieves over 80% success rate across three manipulation tasks.
+              These results demonstrate that leveraging the single demonstration as reusable memory can provide more than static supervision for efficient robot learning.
           </p>
         </div>
       </div>
@@ -309,9 +310,10 @@
           </figure>
 
           <h2 class="subtitle has-text-justified">
-            The left illustrates the retrieve and replay exploration. A Vision Foundation Model (VFM) extracts visual features from both current trajectories and expert demonstrations to retrieve similar expert segments.
-            These segments are leveraged for action replay and similarity-based reward shaping, yielding the reward signal r.
-            The right panel shows the Online Optimization stage, where the policy is optimized through environment interaction using the retrieval-based reward along with a decaying imitation regularization term.
+            ReGIL begins with a retrieval-and-replay exploration phase.
+              A Vision Foundation Model (VFM) extracts visual features from both the agent’s current trajectories and the expert demonstration to retrieve task-relevant expert segments.
+              These retrieved segments are used for action replay and similarity-based reward shaping, providing dense reward signals for learning.
+              During the online optimization phase, the policy is updated through environment interaction using the retrieval-based rewards together with a decaying imitation regularization term.
           </h2>
         </div>
       </div>
@@ -328,15 +330,16 @@
       <h2 class="title is-3">Experimental Result</h2>
       </div>
         <h2 class="subtitle has-text-justified">
-            We evaluate our approach in both simulation and real world under one demonstration setting.
-            We evaluate our method on three real-world tasks using a Franka Emika Panda manipulator: (1) Reach (a fundamental positioning task), (2) Peg-in-Cup (requiring high precision), and (3) Open Box (involving rich-contact dynamics)
-            The right panel shows the Online Optimization stage, where the policy is optimized through environment interaction using the retrieval-based reward along with a decaying imitation regularization term.
+            We evaluate our approach in both simulation and real world under one demonstration setting to evaluate ReGIL.
+
           </h2>
       <div class="column is-full">
 <!-- Start Simulation -->
         <h2 class="subtitle is-3 has-text-weight-bold">Simulation </h2>
           <h2 class="subtitle has-text-justified">
-            on two widely used robotic manipulation benchmarks: Meta-World\citec{metaworld} and LIBERO\citec{libero}.compare with alla baseline
+              In simulation,we evaluate our approach on both Meta-World and LIBERO task suites.For evaluation, the trained agent is evaluated for 10 trajectories during training,
+              except the offline imitation learning methods. We report the mean and standard deviation of the success rate across 5 random seeds for online methods,
+              while report the average success rate for offline methods for 50 trials.
           </h2>
           <h2 class="subtitle is-4 has-text-weight-bold">Baseline comprision</h2>
           <figure class="image">
@@ -360,18 +363,96 @@
                 Reward Ablation Study Result
               </h2>
             </div>
+
           </div>
+        <div class="table-container">
+            <h2 class="subtitle is-4 has-text-weight-bold">Sensitivity Study on Retrieval Parameters</h2>
+            <h2 class="is-size-6 has-text-centered">
+   Table: Effects of Temporal Stride(H),Candidate size(k), and Vision Encoder Selection.
+  </h2>
+    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th rowspan="2" style="vertical-align: middle;">Benchmark</th>
+          <th colspan="3" class="has-text-centered">History (H) [k=5]</th>
+          <th colspan="4" class="has-text-centered">Candidate number (k) [H=5]</th>
+          <th colspan="3" class="has-text-centered">Encoder [k=5, H=5]</th>
+        </tr>
+        <tr>
+          <th>H=10</th>
+          <th>H=5</th>
+          <th>H=3</th>
+          <th>k=10</th>
+          <th>k=5</th>
+          <th>k=3</th>
+          <th>k=1</th>
+          <th>CLIP</th>
+          <th>DINO</th>
+          <th>R3M</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MetaWorld</td>
+          <td>0.48</td>
+          <td>0.53</td>
+          <td>0.46</td>
+          <td>0.53</td>
+          <td>0.53</td>
+          <td>0.50</td>
+          <td>0.48</td>
+          <td>0.475</td>
+          <td>0.53</td>
+          <td>0.45</td>
+        </tr>
+        <tr>
+          <td>LIBERO</td>
+          <td>0.50</td>
+          <td>0.47</td>
+          <td>0.42</td>
+          <td>0.47</td>
+          <td>0.47</td>
+          <td>0.50</td>
+          <td>0.37</td>
+          <td>0.017</td>
+          <td>0.47</td>
+          <td>0.17</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr >
+          <td>Mean</td>
+          <td>0.49</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td>0.44</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td>0.425</td>
+          <td>0.246</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td>0.31</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</div>
       </div>
 <!-- End Simulation -->
-        <!-- End Simulation -->
+        <!-- start Real Robot -->
         <h2 class="subtitle is-3 has-text-weight-bold">Real Robot</h2>
+          <h2 class="subtitle has-text-justified">
+          We evaluate our method on three real-world tasks using a Franka Emika Panda manipulator:
+            (1) Target Reach (a fundamental positioning task), (2) Peg-in-Cup (requiring high precision), and (3)  Box Open(involving rich-contact dynamics)
+          </h2>
         <h2 class="subtitle is-4 has-text-weight-bold"> Demostration</h2>
 
-      <div class="columns is-centered is-variable is-8">
+      <div class="columns is-centered is-variable is-6">
 
         <div class="column is-4">
           <video id="reach_demo" controls muted loop width="100%" preload="metadata">
-            <source src="static/videos/reach.mp4" type="video/mp4">
+            <source src="static/videos/2xreach.mp4" type="video/mp4">
           </video>
           <h3 class="subtitle is-4 has-text-centered mt-2">
             <strong>Target Reach</strong>
@@ -380,7 +461,7 @@
 
         <div class="column is-4">
           <video id="peg_demo" controls muted loop width="100%" preload="metadata">
-            <source src="static/videos/peg.mp4" type="video/mp4">
+            <source src="static/videos/2xpeg.mp4" type="video/mp4">
           </video>
           <h3 class="subtitle is-4 has-text-centered mt-2">
             <strong>Peg-in-Cup</strong>
@@ -389,7 +470,7 @@
 
         <div class="column is-4">
           <video id="open_demo" controls muted loop width="100%" preload="metadata">
-            <source src="static/videos/open.mp4" type="video/mp4">
+            <source src="static/videos/2xopen.mp4" type="video/mp4">
           </video>
           <h3 class="subtitle is-4 has-text-centered mt-2">
             <strong>Box Open</strong>
@@ -770,11 +851,11 @@
         </button>
       </div>
       <pre id="bibtex-code"><code>@article{YourPaperKey2024,
-  title={Your Paper Title Here},
+  title={ReGIL: Retrieval-Guided Imitation Learning from a Single Demonstration},
   author={First Author and Second Author and Third Author},
   journal={Conference/Journal Name},
-  year={2024},
-  url={https://your-domain.com/your-project-page}
+  year={2026},
+  url={https://regil2026.github.io}
 }</code></pre>
     </div>
 </section>
