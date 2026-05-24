@@ -262,7 +262,7 @@
       </video>
       <!-- TODO: Replace with your video description -->
       <h2 class="subtitle has-text-centered">
-        Rather than only using the demonstration once, ReGIL repeatedly queries it during training to support exploration, reward construction, and policy regularization.
+        Rather than only using the demonstration once, ReGIL repeatedly queries it during training to support exploration, regularization data collection, and reward construction.
       </h2>
     </div>
   </div>
@@ -278,16 +278,14 @@
         <div class="content has-text-justified">
           <p>
            Learning robot manipulation policies with deep neural networks from a single demonstration remains highly challenging,
-              as even small deviations from the demonstrated trajectory can quickly compound into failure, while collecting substantial online interaction data is costly.
-        We propose ReGIL, a retrieval-guided imitation learning framework that treats a single demonstration as reusable memory for online robot learning from image observations.
-              ReGIL repeatedly accesses this memory to retrieves task-relevant expert segments throughout training.
-              These segments guide early exploration, regularize policy updates with successful replayed experience,
-              and provide dense rewards through local temporal alignment conditioned on the agent's current progress.
-              This segment-level reward yields step-wise, informative, and computationally efficient feedback for policy improvement.
-              We evaluate ReGIL on challenging robotic manipulation tasks from the LIBERO and Meta-World benchmarks under the single demonstration setting.
-              ReGIL outperforms prior baselines in both success rate and training efficiency.
-              In real-robot experiments, using only one demonstration and less than one hour of online training, ReGIL achieves over 80% success rate across three manipulation tasks.
-              These results demonstrate that leveraging the single demonstration as reusable memory can provide more than static supervision for efficient robot learning.
+            as even small deviations from the demonstrated trajectory can quickly compound into failure, while collecting substantial online interaction data is costly.
+            We propose ReGIL, a retrieval-guided imitation learning framework that treats a single demonstration as an external memory.
+            ReGIL repeatedly queries this static memory throughout training to simultaneously guide exploration, generate the regularization buffer, and construct rewards.
+            Specifically, it computes rewards through local temporal alignment between the current trajectory and the retrieved segment, providing step-wise and informative feedback for policy improvement.
+            We evaluate ReGIL on robotic manipulation tasks from the LIBERO and Meta-World benchmarks under the single demonstration setting.
+            ReGIL outperforms prior baselines in both success rate and training efficiency.
+            In real-robot experiments, using only one demonstration and less than one hour of online training, ReGIL achieves over 75% success rate across three manipulation tasks with randomness in both initial robot pose and target position.
+            These results demonstrate that leveraging the single demonstration as reusable memory can provide more than static supervision for efficient robot learning.
           </p>
         </div>
       </div>
@@ -312,7 +310,7 @@
           <h2 class="subtitle has-text-justified">
             ReGIL begins with a retrieval-and-replay exploration phase.
               A Vision Foundation Model (VFM) extracts visual features from both the agent’s current trajectories and the expert demonstration to retrieve task-relevant expert segments.
-              These retrieved segments are used for action replay and similarity-based reward shaping, providing dense reward signals for learning.
+              These retrieved segments are used for action replay during the early exploration and similarity-based reward shaping throughout the whole process, providing dense reward signals for learning.
               During the online optimization phase, the policy is updated through environment interaction using the retrieval-based rewards together with a decaying imitation regularization term.
           </h2>
         </div>
@@ -337,8 +335,7 @@
 <!-- Start Simulation -->
         <h2 class="subtitle is-3 has-text-weight-bold">Simulation </h2>
           <h2 class="subtitle has-text-justified">
-              In simulation,we evaluate our approach on both Meta-World and LIBERO task suites.For evaluation, the trained agent is evaluated for 10 trajectories during training,
-              except the offline imitation learning methods. We report the mean and standard deviation of the success rate across 5 random seeds for online methods,
+              In simulation,we evaluate our approach on both Meta-World and LIBERO task suites. We report the mean and standard deviation of the success rate across 5 random seeds for online methods,
               while report the average success rate for offline methods for 50 trials.
           </h2>
           <h2 class="subtitle is-4 has-text-weight-bold">Baseline comprision</h2>
@@ -365,79 +362,7 @@
             </div>
 
           </div>
-        <div class="table-container">
-            <h2 class="subtitle is-4 has-text-weight-bold">Sensitivity Study on Retrieval Parameters</h2>
-            <h2 class="is-size-6 has-text-centered">
-   Table: Effects of Temporal Stride(H),Candidate size(k), and Vision Encoder Selection.
-  </h2>
-    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-      <thead>
-        <tr>
-          <th rowspan="2" style="vertical-align: middle;">Benchmark</th>
-          <th colspan="3" class="has-text-centered">History (H) [k=5]</th>
-          <th colspan="4" class="has-text-centered">Candidate number (k) [H=5]</th>
-          <th colspan="3" class="has-text-centered">Encoder [k=5, H=5]</th>
-        </tr>
-        <tr>
-          <th>H=10</th>
-          <th>H=5</th>
-          <th>H=3</th>
-          <th>k=10</th>
-          <th>k=5</th>
-          <th>k=3</th>
-          <th>k=1</th>
-          <th>CLIP</th>
-          <th>DINO</th>
-          <th>R3M</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>MetaWorld</td>
-          <td>0.48</td>
-          <td>0.53</td>
-          <td>0.46</td>
-          <td>0.53</td>
-          <td>0.53</td>
-          <td>0.50</td>
-          <td>0.48</td>
-          <td>0.475</td>
-          <td>0.53</td>
-          <td>0.45</td>
-        </tr>
-        <tr>
-          <td>LIBERO</td>
-          <td>0.50</td>
-          <td>0.47</td>
-          <td>0.42</td>
-          <td>0.47</td>
-          <td>0.47</td>
-          <td>0.50</td>
-          <td>0.37</td>
-          <td>0.017</td>
-          <td>0.47</td>
-          <td>0.17</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr >
-          <td>Mean</td>
-          <td>0.49</td>
-          <td class="has-text-weight-bold">0.50</td>
-          <td>0.44</td>
-          <td class="has-text-weight-bold">0.50</td>
-          <td class="has-text-weight-bold">0.50</td>
-          <td class="has-text-weight-bold">0.50</td>
-          <td>0.425</td>
-          <td>0.246</td>
-          <td class="has-text-weight-bold">0.50</td>
-          <td>0.31</td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
 
-</div>
       </div>
 <!-- End Simulation -->
         <!-- start Real Robot -->
@@ -832,13 +757,292 @@
         </div>
 
         <!-- End demo -->
-
 </div>
 </div>
 </section>
 
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+      <h2 class="title is-3">Additional Analysis</h2>
+      </div>
+<div class="table-container">
+            <h2 class="subtitle is-4 has-text-weight-bold">Sensitivity Study on Retrieval Parameters</h2>
+            <h2 class="is-size-6 has-text-centered">
+   Table: Effects of Temporal Stride(H),Candidate size(k), and Vision Encoder Selection.
+  </h2>
+    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th rowspan="2" style="vertical-align: middle;">Benchmark</th>
+          <th colspan="3" class="has-text-centered">History (H) [k=5]</th>
+          <th colspan="4" class="has-text-centered">Candidate number (k) [H=5]</th>
+          <th colspan="3" class="has-text-centered">Encoder [k=5, H=5]</th>
+        </tr>
+        <tr>
+          <th>H=10</th>
+          <th>H=5</th>
+          <th>H=3</th>
+          <th>k=10</th>
+          <th>k=5</th>
+          <th>k=3</th>
+          <th>k=1</th>
+          <th>CLIP</th>
+          <th>DINO</th>
+          <th>R3M</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MetaWorld</td>
+          <td>0.48</td>
+          <td>0.53</td>
+          <td>0.46</td>
+          <td>0.53</td>
+          <td>0.53</td>
+          <td>0.50</td>
+          <td>0.48</td>
+          <td>0.475</td>
+          <td>0.53</td>
+          <td>0.45</td>
+        </tr>
+        <tr>
+          <td>LIBERO</td>
+          <td>0.50</td>
+          <td>0.47</td>
+          <td>0.42</td>
+          <td>0.47</td>
+          <td>0.47</td>
+          <td>0.50</td>
+          <td>0.37</td>
+          <td>0.017</td>
+          <td>0.47</td>
+          <td>0.17</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr >
+          <td>Mean</td>
+          <td>0.49</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td>0.44</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td>0.425</td>
+          <td>0.246</td>
+          <td class="has-text-weight-bold">0.50</td>
+          <td>0.31</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
 
+    <div class="table-container">
+  <h2 class="subtitle is-4 has-text-weight-bold">Computational Efficiency Analysis</h2>
+  <h2 class="is-size-6 has-text-centered">
+    Table: Latency Breakdown and Computational Efficiency.
+  </h2>
+
+  <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th rowspan="2" style="vertical-align: middle;">Task</th>
+        <th rowspan="2" style="vertical-align: middle;" class="has-text-centered">Total Pipeline Cost (ms)</th>
+        <th colspan="2" class="has-text-centered">Breakdown Cost (ms) &amp; Ratio</th>
+        <th rowspan="2" style="vertical-align: middle;" class="has-text-centered">Max Control Freq. (Hz)</th>
+      </tr>
+      <tr>
+        <th class="has-text-centered">Pure DINO Encoding</th>
+        <th class="has-text-centered">Pure Search + S-DTW</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>MetaWorld</td>
+        <td class="has-text-centered">31.61 &plusmn; 2.17</td>
+        <td class="has-text-centered">30.30 &plusmn; 1.84 <small class="has-text-grey">(95.9%)</small></td>
+        <td class="has-text-centered">1.29 &plusmn; 0.43 <small class="has-text-grey">(4.1%)</small></td>
+        <td class="has-text-centered has-text-weight-semibold">31.64</td>
+      </tr>
+      <tr>
+        <td>LIBERO</td>
+        <td class="has-text-centered">31.07 &plusmn; 1.04</td>
+        <td class="has-text-centered">29.61 &plusmn; 1.02 <small class="has-text-grey">(95.3%)</small></td>
+        <td class="has-text-centered">1.44 &plusmn; 0.05 <small class="has-text-grey">(4.6%)</small></td>
+        <td class="has-text-centered has-text-weight-semibold">32.18</td>
+      </tr>
+      <tr>
+        <td>Real Insert</td>
+        <td class="has-text-centered">32.85 &plusmn; 4.64</td>
+        <td class="has-text-centered">30.56 &plusmn; 3.22 <small class="has-text-grey">(93.0%)</small></td>
+        <td class="has-text-centered">2.26 &plusmn; 2.38 <small class="has-text-grey">(6.9%)</small></td>
+        <td class="has-text-centered has-text-weight-semibold">30.45</td>
+      </tr>
+      <tr>
+        <td>Real Reach</td>
+        <td class="has-text-centered">31.94 &plusmn; 3.92</td>
+        <td class="has-text-centered">30.09 &plusmn; 3.82 <small class="has-text-grey">(94.2%)</small></td>
+        <td class="has-text-centered">1.83 &plusmn; 0.21 <small class="has-text-grey">(5.7%)</small></td>
+        <td class="has-text-centered has-text-weight-semibold">31.31</td>
+      </tr>
+      <tr>
+        <td>Real Open</td>
+        <td class="has-text-centered">31.44 &plusmn; 1.32</td>
+        <td class="has-text-centered">29.32 &plusmn; 1.29 <small class="has-text-grey">(93.3%)</small></td>
+        <td class="has-text-centered">2.09 &plusmn; 0.21 <small class="has-text-grey">(6.7%)</small></td>
+        <td class="has-text-centered has-text-weight-semibold">31.81</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+      <div class="table-container">
+  <h2 class="subtitle is-4 has-text-weight-bold">Success Buffer Size Across Tasks</h2>
+  <h2 class="is-size-6 has-text-centered mb-3">
+    Table: Mean and standard deviation of samples collected in the success buffer. Maximum capacity is indicated in parentheses.
+  </h2>
+
+  <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th class="has-text-centered" style="vertical-align: middle;">Environment</th>
+        <th class="has-text-centered" style="vertical-align: middle;">Suite (Maximum)</th>
+        <th class="has-text-centered" style="vertical-align: middle;">Task Name</th>
+        <th class="has-text-centered" style="vertical-align: middle;">Success Buffer Size<br><small>(Mean &plusmn; Std)</small></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td rowspan="7" class="has-text-weight-bold has-text-centered" style="vertical-align: middle;">Simulation</td>
+        <td rowspan="7" class="has-text-centered" style="vertical-align: middle;">MetaWorld<br><span class="has-text-grey">(5000)</span></td>
+        <td>button_press</td>
+        <td class="has-text-centered">1716.00 &plusmn; 266.17</td>
+      </tr>
+      <tr>
+        <td>door_open</td>
+        <td class="has-text-centered">2841.50 &plusmn; 674.94</td>
+      </tr>
+      <tr>
+        <td>drawer_close</td>
+        <td class="has-text-centered">3222.80 &plusmn; 244.98</td>
+      </tr>
+      <tr>
+        <td>drawer_open</td>
+        <td class="has-text-centered">2301.00 &plusmn; 243.07</td>
+      </tr>
+      <tr > <!--style="background-color: #fff0f0;" -->
+        <td >hammer</td>
+        <td class="has-text-centered ">455.83 &plusmn; 146.58</td>
+      </tr>
+      <tr>
+        <td>window_close</td>
+        <td class="has-text-centered">3031.20 &plusmn; 544.19</td>
+      </tr>
+      <tr>
+        <td>window_open</td>
+        <td class="has-text-centered">1807.60 &plusmn; 500.73</td>
+      </tr>
+
+      <tr>
+        <td rowspan="6" class="has-text-weight-bold has-text-centered" style="vertical-align: middle;">Simulation</td>
+        <td rowspan="6" class="has-text-centered" style="vertical-align: middle;">LIBERO<br><span class="has-text-grey">(10000)</span></td>
+        <td>kitchen1_bowl_on_cabinet</td>
+        <td class="has-text-centered">9897.83 &plusmn; 34.32</td>
+      </tr>
+      <tr>
+        <td>kitchen1_drawer</td>
+        <td class="has-text-centered">9915.80 &plusmn; 22.56</td>
+      </tr>
+      <tr>
+        <td>kitchen1_bowl_on_plate</td>
+        <td class="has-text-centered">3023.83 &plusmn; 973.09</td>
+      </tr>
+      <tr>
+        <td>kitchen2_bowl_on_plate</td>
+        <td class="has-text-centered">7505.67 &plusmn; 959.24</td>
+      </tr>
+      <tr>
+        <td>living5_mug_on_plate</td>
+        <td class="has-text-centered">6228.40 &plusmn; 765.61</td>
+      </tr>
+      <tr>
+        <td>study4</td>
+        <td class="has-text-centered">9961.17 &plusmn; 25.16</td>
+      </tr>
+
+      <tr>
+        <td rowspan="3" class="has-text-weight-bold has-text-centered" style="vertical-align: middle;">Real World</td>
+        <td class="has-text-centered"><span class="has-text-grey">(1000)</span></td>
+        <td>reach</td>
+        <td class="has-text-centered">814.00</td>
+      </tr>
+      <tr>
+        <td class="has-text-centered"><span class="has-text-grey">(1300)</span></td>
+        <td>insert</td>
+        <td class="has-text-centered">961.00</td>
+      </tr>
+      <tr>
+        <td class="has-text-centered"><span class="has-text-grey">(1300)</span></td>
+        <td>open</td>
+        <td class="has-text-centered">947.00</td>
+      </tr>
+    </tbody>
+  </table>
+      </div>
+        <h2 class="subtitle is-4 has-text-weight-bold">Success Buffer Qualitative Analysis</h2>
+        <h2 class="subtitle is-5 has-text-centered has-text-weight-bold">Task Trajectories Visualization</h2>
+
+        <div class="columns is-centered is-variable is-1">
+
+
+        <div class="column is-4 has-text-right">
+          <video id="k1_cab" controls muted loop width="100%" preload="metadata" style="max-width: 80%; height: 80%;">
+            <source src="static/videos/kitchen1_bowl_cabinet.mp4" type="video/mp4">
+          </video>
+          <h3 class="subtitle is-4 has-text-right mt-2">
+            <span>K1_Bowl_on_Cabinet</span>
+          </h3>
+        </div>
+
+        <div class="column is-4 has-text-centered">
+          <video id="k2_plate" controls muted loop width="100%" preload="metadata" style="max-width: 80%; height: 80%;">
+            <source src="static/videos/kitchen2_bowl_plate.mp4" type="video/mp4">
+          </video>
+          <h3 class="subtitle is-4 has-text-centered mt-2">
+            <span>K2_Bowl_on_Plate</span>
+          </h3>
+        </div>
+
+        <div class="column is-4 has-text-left">
+          <video id="k1_plate" controls muted loop width="100%" preload="metadata" style="max-width: 80%; height: 80%;">
+            <source src="static/videos/kitchen1_bowl_plate.mp4" type="video/mp4">
+          </video>
+          <h3 class="subtitle is-4 has-text-left mt-2">
+            <span>K1_Bowl_on_Plate</span>
+          </h3>
+        </div>
+        </div>
+
+          <figure class="image">
+            <img src="static/images/sf_com.png" alt="Research result visualization" style="border-radius: 10px;">
+          </figure>
+
+          <h2 class="subtitle has-text-justified">
+            Training performance comparison across three similar kitchen manipulation tasks.
+              Left: Success rates across 5 runs, and the shaded regions indicate the standard deviation.
+              Right: Average success buffer size collected during training.
+          </h2>
+
+
+</div>
+</div>
+</section>
 
 <!--BibTex citation -->
   <section class="section" id="BibTeX">
