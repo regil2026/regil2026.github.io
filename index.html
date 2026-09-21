@@ -277,15 +277,13 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-           Learning robot manipulation policies with deep neural networks from a single demonstration remains highly challenging,
-            as even small deviations from the demonstrated trajectory can quickly compound into failure, while collecting substantial online interaction data is costly.
-            We propose ReGIL, a retrieval-guided imitation learning framework that treats a single demonstration as an external memory.
-            ReGIL repeatedly queries this static memory throughout training to simultaneously guide exploration, generate the regularization buffer, and construct rewards.
-            Specifically, it computes rewards through local temporal alignment between the current trajectory and the retrieved segment, providing step-wise and informative feedback for policy improvement.
-            We evaluate ReGIL on robotic manipulation tasks from the LIBERO and Meta-World benchmarks under the single demonstration setting.
-            ReGIL outperforms prior baselines in both success rate and training efficiency.
-            In real-robot experiments, using only one demonstration and less than one hour of online training, ReGIL achieves over 75% success rate across three manipulation tasks with randomness in both initial robot pose and target position.
-            These results demonstrate that leveraging the single demonstration as reusable memory can provide more than static supervision for efficient robot learning.
+            Learning robot manipulation policies with deep neural networks from a single demonstration remains highly challenging, as even small deviations from the demonstrated trajectory can quickly compound into failure. 
+            We propose ReGIL, a retrieval-guided imitation learning framework that treats a single demonstration as persistent external memory throughout online learning. 
+            Rather than using the demonstration only as static supervision, ReGIL continuously retrieves task-relevant expert segments from this memory to simultaneously guide exploration, expand a success buffer with online experience, and construct dense reward signals through local temporal alignment.
+            We evaluate ReGIL on robotic manipulation tasks from the LIBERO and MetaWorld benchmarks under the single-demonstration setting. 
+            ReGIL outperforms prior baselines in both success rate and training efficiency. 
+            In real-robot experiments, using only one demonstration and less than one hour of online training, ReGIL achieves 96.7% success under fixed-target configurations and 80.0% under random-target evaluation across three manipulation tasks. 
+            These results demonstrate that leveraging the single demonstration as reusable memory can provide persistent guidance for efficient online robot learning beyond static imitation supervision.
           </p>
         </div>
       </div>
